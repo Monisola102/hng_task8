@@ -1,0 +1,37 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")  // must use env()
+
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String?
+  apiKeys   ApiKey[] // One-to-many relation to ApiKey
+  createdAt DateTime @default(now())
+
+  @@index([email])
+}
+
+model ApiKey {
+  id        String   @id @default(uuid())
+  prefix    String
+  keyHash   String
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime?
+  revokedAt DateTime?
+  createdAt DateTime @default(now())
+
+  @@index([prefix])
+  @@index([userId])
+}
