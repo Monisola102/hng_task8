@@ -33,9 +33,9 @@ Built with **NestJS**, **Prisma** (PostgreSQL), and **JWT**.
 
 | Method | Endpoint             | Description                  | Request Body | Response                                           |
 |--------|--------------------|-----------------------------|--------------|--------------------------------------------------|
-| POST   | `/keys/create`      | Generate a new API key       | `{ "expiresAt": "2025-12-30T23:59:59.000Z" } `|   `{ key_id, api_key, created_at }`|
-| GET    | `/keys/list`        | List all active API keys     | N/A          | [ { "id", "prefix", "expiresAt", "revokedAt", "createdAt" } ]   |
-| POST   | `/keys/revoke/:id`  | Revoke an API key            | N/A          |  { "id", "revokedAt" } |
+| POST   | `/keys/create`      | Generate a new API key       | `{ "expiresAt": "2025-12-30T23:59:59.000Z" } `| `{ "id", "prefix", "rawKey", "expiresAt", "createdAt" } `|
+| GET    | `/keys/list`        | List all active API keys     | N/A          | `[ { "id", "prefix", "expiresAt", "revokedAt", "createdAt" } ] ` |
+| POST   | `/keys/revoke/:id`  | Revoke an API key            | N/A          | ` { "id", "revokedAt" } `|
 
 ## Protected Routes
 
