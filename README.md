@@ -22,20 +22,27 @@ Built with **NestJS**, **Prisma** (PostgreSQL), and **JWT**.
 
 ## API Endpoints
 
-### Auth Routes
+## Authentication Routes
 
-| Method | Endpoint          | Description                  | Request Body                | Response                         |
-|--------|-----------------|-----------------------------|----------------------------|---------------------------------|
-| POST   | `/auth/signup`   | Register a new user           | `{ email, password, name? }` | `{ user_id, email, name, token }` |
-| POST   | `/auth/login`    | Login user and issue JWT      | `{ email, password }`       | `{ user_id, email, token }`     |
+| Method | Endpoint        | Description                  | Request Body                | Response                         |
+|--------|----------------|-----------------------------|----------------------------|---------------------------------|
+| POST   | `/auth/signup`  | Register a new user           | `{ email, password, name? }` | `{ user_id, email, name, token }` |
+| POST   | `/auth/login`   | Login user and issue JWT      | `{ email, password }`       | `{ user_id, email, token }`     |
 
-### API Key Routes
+## API Key Routes
 
-| Method | Endpoint            | Description                  | Request Body | Response                                           |
-|--------|-------------------|-----------------------------|--------------|--------------------------------------------------|
-| POST   | `/keys/create`     | Generate a new API key       | `{ name }`   | `{ key_id, api_key, created_at }`               |
-| GET    | `/keys/list`       | List all active API keys     | N/A          | `[ { key_id, name, created_at, revoked } ]`     |
-| POST   | `/keys/revoke/:id`| Revoke an API key            | N/A          | `{ key_id, revoked: true }`                      |
+| Method | Endpoint             | Description                  | Request Body | Response                                           |
+|--------|--------------------|-----------------------------|--------------|--------------------------------------------------|
+| POST   | `/keys/create`      | Generate a new API key       | `{ "expiresAt": "2025-12-30T23:59:59.000Z" } `|   `{ key_id, api_key, created_at }`|
+| GET    | `/keys/list`        | List all active API keys     | N/A          | [ { "id", "prefix", "expiresAt", "revokedAt", "createdAt" } ]   |
+| POST   | `/keys/revoke/:id`  | Revoke an API key            | N/A          |  { "id", "revokedAt" } |
+
+## Protected Routes
+
+| Method | Endpoint           | Description                         | Request Body | Response                                      |
+|--------|------------------|------------------------------------|--------------|----------------------------------------------|
+| GET    | `/profile`        | Get currently logged-in user info   | N/A          | `{ id, email, name }`                         |
+| GET    | `/service/ping`   | Service-to-service access ping      | N/A          | `{ ok: true, serviceOwner, keyPrefix }`      |
 
 ---
 
