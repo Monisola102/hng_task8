@@ -12,7 +12,7 @@ export class KeysService {
 
   private generateRawKey() {
     const bytes = parseInt(this.config.get('API_KEY_BYTES') || '32', 10);
-    return randomBytes(bytes).toString('hex'); // full raw key
+    return randomBytes(bytes).toString('hex'); 
   }
 
   private getPrefix(rawKey: string) {
@@ -25,9 +25,9 @@ export class KeysService {
   }
 
   async createKey(userId: string, expiresAt?: Date) {
-    const raw = this.generateRawKey();        // full raw key
-    const prefix = this.getPrefix(raw);       // consistent prefix
-    const hash = this.hashKey(raw);           // hashed stored
+    const raw = this.generateRawKey();     
+    const prefix = this.getPrefix(raw);      
+    const hash = this.hashKey(raw);           
 
     const rec = await this.prisma.apiKey.create({
       data: {
@@ -41,7 +41,7 @@ export class KeysService {
     return {
       id: rec.id,
       prefix: rec.prefix,
-      rawKey: raw, // only return ONCE
+      rawKey: raw, 
       expiresAt: rec.expiresAt,
       createdAt: rec.createdAt,
     };

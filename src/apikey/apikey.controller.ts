@@ -1,4 +1,13 @@
-import { Controller, Post, Body, Req, UseGuards, Get, Param, ForbiddenException } from '@nestjs/common'
+import {
+  Controller,
+  Post,
+  Body,
+  Req,
+  UseGuards,
+  Get,
+  Param,
+  ForbiddenException,
+} from '@nestjs/common';
 import { KeysService } from './apikey.service';
 import { CreateKeyDto } from './dto/create-key.dto';
 import { AuthGuard } from '../shared/auth.guard';
@@ -20,7 +29,7 @@ export class KeysController {
       dto.expiresAt ? new Date(dto.expiresAt) : undefined,
     );
 
-    return key; // raw key returned only once
+    return key;
   }
 
   @UseGuards(AuthGuard)

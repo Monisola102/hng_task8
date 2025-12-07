@@ -17,7 +17,7 @@ import { PrismaModule } from '../prisma/prisma.module';
         return {
           secret: config.get<string>('JWT_SECRET') || 'defaultsecret',
           signOptions: {
-            expiresIn, // number of seconds ✅ TypeScript-safe
+            expiresIn,
           },
         };
       },
@@ -26,6 +26,6 @@ import { PrismaModule } from '../prisma/prisma.module';
   ],
   controllers: [AuthController],
   providers: [AuthService],
-  exports: [AuthService],
+  exports: [AuthService,JwtModule],
 })
 export class AuthModule {}

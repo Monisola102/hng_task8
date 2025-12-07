@@ -1,7 +1,12 @@
-import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  CanActivate,
+  ExecutionContext,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { KeysService } from '../apikey/apikey.service.js'; // fixed relative path
-import { PrismaService } from '../prisma/prisma.service.js'; // fixed relative p
+import { KeysService } from '../apikey/apikey.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
@@ -16,35 +21,43 @@ export class AuthGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest();
 
-    // 1) Check Authorization Bearer token
-    const auth = req.headers['authorization'];
-    if (auth && typeof auth === 'string' && auth.startsWith('Bearer ')) {
-      const token = auth.slice(7);
+    const authHeader = req.headers['authorization'];
+    if (
+      authHeader &&
+      typeof authHeader === 'string' &&
+      authHeader.startsWith('Bearer ')
+    ) {
+      const token = authHeader.slice(7).trim();
       try {
         const payload = this.jwt.verify(token, {
           secret: this.config.get<string>('JWT_SECRET'),
         });
-        const user = await this.prisma.user.findUnique({ where: { id: payload.sub } });
-        if (!user) throw new UnauthorizedException('Invalid token');
 
-        req.auth = { type: 'user', user };
+        const user = await this.prisma.user.findUnique({
+          where: { id: payload.sub },
+        });
+        if (!user) throw new UnauthorizedException('Invalid token');
+        console.log('JWT user detected:', req.user);
+        req.user = { ...user, type: 'user' };
         return true;
-      } catch (err) {
+      } catch {
         throw new UnauthorizedException('Invalid token');
       }
     }
-
-    // 2) Check x-api-key header
-    const apiKey = req.headers['x-api-key'] || req.headers['x_api_key'];
-    if (apiKey && typeof apiKey === 'string') {
-      const res = await this.keysService.validateApiKey(apiKey);
-      if (!res) throw new UnauthorizedException('Invalid API key');
-
-      req.auth = { type: 'service', apiKey: res.apiKey, user: res.user };
+    const apiKeyHeader = req.headers['x-api-key'] || req.headers['x_api_key'];
+    if (apiKeyHeader && typeof apiKeyHeader === 'string') {
+      const keyData = await this.keysService.validateApiKey(apiKeyHeader);
+      console.log('Received x-api-key:', apiKeyHeader);
+      console.log('validateApiKey result:', keyData);
+      if (!keyData) throw new UnauthorizedException('Invalid API key');
+      req.user = {
+        id: keyData.user?.id || null,
+        type: 'service',
+        apiKey: keyData.apiKey,
+        user: keyData.user || null,
+      };
       return true;
     }
-
-    // 3) None provided
     throw new UnauthorizedException('No credentials provided');
   }
 }
